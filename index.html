@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDMS — Company Data Management System</title>
+    <meta name="application-name" content="CDMS">
+    <meta name="description" content="Company Data Management System">
+    <link rel="icon" href="favicon.ico" sizes="32x32">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Login animated background -->
+<div class="login-bg" id="loginBg">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+        <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+        <div class="navbar-brand">
+            <div class="logo">C</div>
+            <span>CDMS</span>
+        </div>
+    </div>
+    <div class="navbar-actions hidden" id="navbarActions">
+        <button class="icon-btn" id="themeIcon" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+        <div class="user-badge">
+            <div class="user-avatar">A</div>
+            <span>Admin</span>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Main Menu</div>
+    <a onclick="showSection('dashboard')" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+    <a onclick="showSection('employees')" data-section="employees"><span class="nav-icon">👥</span> Employees</a>
+    <a onclick="showSection('machines')" data-section="machines"><span class="nav-icon">⚙️</span> Machinery</a>
+    <a onclick="showSection('projects')" data-section="projects"><span class="nav-icon">📋</span> Projects</a>
+    <a onclick="showSection('vehicles')" data-section="vehicles"><span class="nav-icon">🚗</span> Vehicles</a>
+    <div class="sidebar-label">Analytics</div>
+    <a onclick="showSection('reports')" data-section="reports"><span class="nav-icon">📈</span> Reports</a>
+    <a onclick="showSection('settings')" data-section="settings"><span class="nav-icon">⚙️</span> Settings</a>
+    <a class="logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</a>
+</aside>
+
+<!-- Main Content -->
+<main class="content" id="mainContent">
+
+    <!-- ═══ LOGIN ═══ -->
+    <section id="loginSection" class="section active">
+        <div class="login-wrapper">
+            <div class="login-card">
+                <h2>Welcome Back</h2>
+                <p class="login-subtitle">Sign in to your Company Dashboard</p>
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+                    <button class="pw-toggle" onclick="togglePassword()" type="button">👁️</button>
+                </div>
+                <div class="login-options">
+                    <label><input type="checkbox" id="rememberMe"> Remember me</label>
+                </div>
+                <button class="btn-login" onclick="login()">Sign In</button>
+                <p class="error-msg" id="loginError">Invalid credentials. Try admin / 1234</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <section id="dashboard" class="section">
+        <div class="page-header">
+            <div>
+                <h2 id="greeting">Good morning, Admin</h2>
+                <p>Here's what's happening across your company today.</p>
+            </div>
+            <span class="badge badge-primary"><span id="totalRecords">0</span> Total Records</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card emp" onclick="showSection('employees')">
+                <div class="stat-icon">👥</div>
+                <div class="stat-label">Employees</div>
+                <div class="stat-value" id="empCount">0</div>
+            </div>
+            <div class="stat-card machine" onclick="showSection('machines')">
+                <div class="stat-icon">⚙️</div>
+                <div class="stat-label">Machinery</div>
+                <div class="stat-value" id="machineCount">0</div>
+            </div>
+            <div class="stat-card project" onclick="showSection('projects')">
+                <div class="stat-icon">📋</div>
+                <div class="stat-label">Projects</div>
+                <div class="stat-value" id="projectCount">0</div>
+            </div>
+            <div class="stat-card vehicle" onclick="showSection('vehicles')">
+                <div class="stat-icon">🚗</div>
+                <div class="stat-label">Vehicles</div>
+                <div class="stat-value" id="vehicleCount">0</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">📊 Data Overview</div>
+                <div class="chart-container" id="chartBars"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">🕐 Recent Activity</div>
+                <div id="activityFeed"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ EMPLOYEES ═══ -->
+    <section id="employees" class="section">
+        <div class="page-header">
+            <div><h2>👥 Employee Management</h2><p>Add, edit, and manage your workforce</p></div>
+        </div>
+        <div class="card">
+            <div class="module-toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search employees..." oninput="searchTable('emp', this.value)">
+                </div>
+                <button class="btn btn-success" onclick="addRow('emp')">➕ Add Employee</button>
+                <button class="btn btn-secondary" onclick="exportCSV('emp')">📥 Export CSV</button>
+            </div>
+            <div class="form-panel" id="empFormPanel">
+                <div class="form-panel-header" onclick="toggleFormPanel('emp')">
+                    <h3>📝 New Employee Form</h3><span>▼</span>
+                </div>
+                <div class="form-panel-body">
+                    <div class="form-row" id="empForm"></div>
+                    <button class="btn btn-primary" onclick="addRow('emp')">Save Employee</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="empTable"><thead><tr id="empHeader"></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="empty-state hidden" id="empEmpty">
+                <div class="empty-icon">👥</div><h3>No employees yet</h3><p>Add your first employee using the form above</p>
+            </div>
+            <div class="pagination" id="empPagination"></div>
+            <div class="column-tools">
+                <input id="empNewColumn" placeholder="New column name">
+                <button class="btn btn-secondary btn-sm" onclick="addColumn('emp')">Add Column</button>
+                <input id="empRemoveColumn" placeholder="Column to remove">
+                <button class="btn btn-danger btn-sm" onclick="removeColumn('emp')">Remove Column</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MACHINERY ═══ -->
+    <section id="machines" class="section">
+        <div class="page-header">
+            <div><h2>⚙️ Machinery Management</h2><p>Track equipment, maintenance, and status</p></div>
+        </div>
+        <div class="card">
+            <div class="module-toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search machinery..." oninput="searchTable('machine', this.value)">
+                </div>
+                <button class="btn btn-success" onclick="addRow('machine')">➕ Add Machine</button>
+                <button class="btn btn-secondary" onclick="exportCSV('machine')">📥 Export CSV</button>
+            </div>
+            <div class="form-panel" id="machineFormPanel">
+                <div class="form-panel-header" onclick="toggleFormPanel('machine')">
+                    <h3>📝 New Machine Form</h3><span>▼</span>
+                </div>
+                <div class="form-panel-body">
+                    <div class="form-row" id="machineForm"></div>
+                    <button class="btn btn-primary" onclick="addRow('machine')">Save Machine</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="machineTable"><thead><tr id="machineHeader"></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="empty-state hidden" id="machineEmpty">
+                <div class="empty-icon">⚙️</div><h3>No machines registered</h3><p>Add your first machine using the form above</p>
+            </div>
+            <div class="pagination" id="machinePagination"></div>
+            <div class="column-tools">
+                <input id="machineNewColumn" placeholder="New column name">
+                <button class="btn btn-secondary btn-sm" onclick="addColumn('machine')">Add Column</button>
+                <input id="machineRemoveColumn" placeholder="Column to remove">
+                <button class="btn btn-danger btn-sm" onclick="removeColumn('machine')">Remove Column</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROJECTS ═══ -->
+    <section id="projects" class="section">
+        <div class="page-header">
+            <div><h2>📋 Tender &amp; Project Tracking</h2><p>Monitor projects, budgets, and deadlines</p></div>
+        </div>
+        <div class="card">
+            <div class="module-toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search projects..." oninput="searchTable('project', this.value)">
+                </div>
+                <button class="btn btn-success" onclick="addRow('project')">➕ Add Project</button>
+                <button class="btn btn-secondary" onclick="exportCSV('project')">📥 Export CSV</button>
+            </div>
+            <div class="form-panel" id="projectFormPanel">
+                <div class="form-panel-header" onclick="toggleFormPanel('project')">
+                    <h3>📝 New Project Form</h3><span>▼</span>
+                </div>
+                <div class="form-panel-body">
+                    <div class="form-row" id="projectForm"></div>
+                    <button class="btn btn-primary" onclick="addRow('project')">Save Project</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="projectTable"><thead><tr id="projectHeader"></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="empty-state hidden" id="projectEmpty">
+                <div class="empty-icon">📋</div><h3>No projects yet</h3><p>Start tracking your first tender or project</p>
+            </div>
+            <div class="pagination" id="projectPagination"></div>
+            <div class="column-tools">
+                <input id="projectNewColumn" placeholder="New column name">
+                <button class="btn btn-secondary btn-sm" onclick="addColumn('project')">Add Column</button>
+                <input id="projectRemoveColumn" placeholder="Column to remove">
+                <button class="btn btn-danger btn-sm" onclick="removeColumn('project')">Remove Column</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ VEHICLES ═══ -->
+    <section id="vehicles" class="section">
+        <div class="page-header">
+            <div><h2>🚗 Vehicle Management</h2><p>Manage fleet, insurance, and compliance</p></div>
+        </div>
+        <div class="card">
+            <div class="module-toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search vehicles..." oninput="searchTable('vehicle', this.value)">
+                </div>
+                <button class="btn btn-success" onclick="addRow('vehicle')">➕ Add Vehicle</button>
+                <button class="btn btn-secondary" onclick="exportCSV('vehicle')">📥 Export CSV</button>
+            </div>
+            <div class="form-panel" id="vehicleFormPanel">
+                <div class="form-panel-header" onclick="toggleFormPanel('vehicle')">
+                    <h3>📝 New Vehicle Form</h3><span>▼</span>
+                </div>
+                <div class="form-panel-body">
+                    <div class="form-row" id="vehicleForm"></div>
+                    <button class="btn btn-primary" onclick="addRow('vehicle')">Save Vehicle</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="vehicleTable"><thead><tr id="vehicleHeader"></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="empty-state hidden" id="vehicleEmpty">
+                <div class="empty-icon">🚗</div><h3>No vehicles registered</h3><p>Add your first vehicle to the fleet</p>
+            </div>
+            <div class="pagination" id="vehiclePagination"></div>
+            <div class="column-tools">
+                <input id="vehicleNewColumn" placeholder="New column name">
+                <button class="btn btn-secondary btn-sm" onclick="addColumn('vehicle')">Add Column</button>
+                <input id="vehicleRemoveColumn" placeholder="Column to remove">
+                <button class="btn btn-danger btn-sm" onclick="removeColumn('vehicle')">Remove Column</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ REPORTS ═══ -->
+    <section id="reports" class="section">
+        <div class="page-header">
+            <div><h2>📈 Reports &amp; Analytics</h2><p>Financial summaries and module insights</p></div>
+            <button class="btn btn-secondary" onclick="exportAllJSON()">📥 Export Full Backup</button>
+        </div>
+        <div id="reportsContent"></div>
+    </section>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <section id="settings" class="section">
+        <div class="page-header">
+            <div><h2>⚙️ Settings</h2><p>Customize your experience and manage data</p></div>
+        </div>
+        <div class="card">
+            <div class="settings-group">
+                <h3>Appearance</h3>
+                <div class="setting-row">
+                    <div><strong>Dark Mode</strong><div class="setting-desc">Switch between light and dark themes</div></div>
+                    <button class="toggle" id="themeToggle" onclick="toggleTheme(); this.classList.toggle('on')"></button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>Data Management</h3>
+                <div class="setting-row">
+                    <div><strong>Export Backup</strong><div class="setting-desc">Download all data as JSON file</div></div>
+                    <button class="btn btn-secondary" onclick="exportAllJSON()">Export</button>
+                </div>
+                <div class="setting-row">
+                    <div><strong>Import Backup</strong><div class="setting-desc">Restore data from a JSON backup file</div></div>
+                    <button class="btn btn-secondary" onclick="importJSON()">Import</button>
+                </div>
+                <div class="setting-row">
+                    <div><strong>Reset All Data</strong><div class="setting-desc">Permanently delete all records and reset columns</div></div>
+                    <button class="btn btn-danger" onclick="resetAllData()">Reset</button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>About</h3>
+                <div class="setting-row">
+                    <div><strong>CDMS v2.0</strong><div class="setting-desc">Company Data Management System — Client-side demo application</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+        <h3 id="modalTitle">Confirm</h3>
+        <p id="modalMessage">Are you sure?</p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmModal()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    if (localStorage.getItem('cdms_theme') === 'dark') {
+        document.getElementById('themeToggle')?.classList.add('on');
+    }
+</script>
+</body>
+</html>
