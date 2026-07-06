@@ -3,36 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDMS — Company Data Management System</title>
+    <title>CDMS — Company Data Management System | Netz</title>
     <meta name="application-name" content="CDMS">
-    <meta name="description" content="Company Data Management System">
+    <meta name="description" content="CDMS — Company Data Management System for Netz">
     <link rel="icon" href="favicon.ico" sizes="32x32">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="favicon.ico">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
+<body class="booting">
 
-<!-- Login animated background -->
 <div class="login-bg" id="loginBg">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
+    <div class="orb"></div><div class="orb"></div><div class="orb"></div>
 </div>
+
+<!-- Loader -->
+<div class="loader-overlay" id="loader"><div class="spinner"></div></div>
+<div class="success-flash" id="successFlash">✓ Saved</div>
 
 <!-- Navbar -->
 <nav class="navbar">
-    <div style="display:flex;align-items:center;gap:12px;">
-        <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+    <div class="navbar-left">
+        <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Menu" title="Menu">☰</button>
         <div class="navbar-brand">
             <div class="logo">C</div>
-            <span>CDMS</span>
+            <div>
+                <span class="brand-title">CDMS</span>
+                <span class="brand-sub" id="navbarSubtitle">Netz</span>
+            </div>
+        </div>
+    </div>
+    <div class="navbar-search hidden" id="navbarSearch">
+        <div class="search-box global-search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearch" placeholder="Search all modules..." title="Global search">
+            <div class="search-results" id="globalSearchResults"></div>
         </div>
     </div>
     <div class="navbar-actions hidden" id="navbarActions">
+        <button class="icon-btn" onclick="startTour()" title="Take a tour">❓</button>
+        <div class="notif-wrap">
+            <button class="icon-btn" onclick="toggleNotifications()" title="Notifications">🔔</button>
+            <span class="notif-badge hidden" id="notifBadge">0</span>
+            <div class="notif-panel" id="notifPanel"></div>
+        </div>
         <button class="icon-btn" id="themeIcon" onclick="toggleTheme()" title="Toggle theme">🌙</button>
-        <div class="user-badge">
+        <div class="user-badge" title="Logged in as Admin">
             <div class="user-avatar">A</div>
             <span>Admin</span>
         </div>
@@ -41,7 +58,7 @@
 
 <!-- Sidebar -->
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-label">Main Menu</div>
+    <div class="sidebar-label">CDMS Modules</div>
     <a onclick="showSection('dashboard')" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a>
     <a onclick="showSection('employees')" data-section="employees"><span class="nav-icon">👥</span> Employees</a>
     <a onclick="showSection('machines')" data-section="machines"><span class="nav-icon">⚙️</span> Machinery</a>
@@ -53,286 +70,284 @@
     <a class="logout" onclick="logout()"><span class="nav-icon">🚪</span> Logout</a>
 </aside>
 
-<!-- Main Content -->
-<main class="content" id="mainContent">
+<!-- Detail Panel -->
+<aside class="detail-panel" id="detailPanel">
+    <button class="detail-close" onclick="closeDetail()" title="Close">✕</button>
+    <div id="detailBody"></div>
+</aside>
 
-    <!-- ═══ LOGIN ═══ -->
-    <section id="loginSection" class="section active">
-        <div class="login-wrapper">
-            <div class="login-card">
-                <h2>Welcome Back</h2>
-                <p class="login-subtitle">Sign in to your Company Dashboard</p>
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+<main class="content" id="mainContent">
+    <div class="breadcrumbs" id="breadcrumbs"></div>
+
+    <!-- HOME / LANDING -->
+    <section id="home" class="section">
+        <div class="landing">
+            <div class="landing-hero">
+                <span class="landing-badge">Internship Project at Netz</span>
+                <h1>CDMS</h1>
+                <p class="landing-tagline">Company Data Management System</p>
+                <p class="landing-desc">A unified dashboard for <strong>Netz</strong> to manage employees, machinery, projects, and vehicles — with real-time analytics, alerts, and exportable reports.</p>
+                <div class="landing-modules">
+                    <div class="landing-mod" onclick="goToLogin()"><span>👥</span><strong>Employees</strong><small>Workforce</small></div>
+                    <div class="landing-mod" onclick="goToLogin()"><span>⚙️</span><strong>Machinery</strong><small>Equipment</small></div>
+                    <div class="landing-mod" onclick="goToLogin()"><span>📋</span><strong>Projects</strong><small>Tenders</small></div>
+                    <div class="landing-mod" onclick="goToLogin()"><span>🚗</span><strong>Vehicles</strong><small>Fleet</small></div>
                 </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
-                    <button class="pw-toggle" onclick="togglePassword()" type="button">👁️</button>
-                </div>
-                <div class="login-options">
-                    <label><input type="checkbox" id="rememberMe"> Remember me</label>
-                </div>
-                <button class="btn-login" onclick="login()">Sign In</button>
-                <p class="error-msg" id="loginError">Invalid credentials. Try admin / 1234</p>
+                <button class="btn-landing" onclick="goToLogin()">Login to CDMS →</button>
             </div>
         </div>
     </section>
 
-    <!-- ═══ DASHBOARD ═══ -->
+    <!-- LOGIN -->
+    <section id="login" class="section">
+        <div class="login-wrapper">
+            <div class="login-card">
+                <p class="login-company">Netz</p>
+                <h2>Login</h2>
+                <p class="login-subtitle">Sign in to CDMS — Company Data Management System</p>
+                <div class="input-group">
+                    <label for="username">Username <span class="req">*</span></label>
+                    <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+                    <span class="field-error light" id="usernameError"></span>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+                        <button class="pw-toggle" onclick="togglePassword()" type="button" title="Show/hide password">👁️</button>
+                    </div>
+                    <span class="field-error light" id="passwordError"></span>
+                </div>
+                <div class="login-options">
+                    <label><input type="checkbox" id="rememberMe"> Remember me</label>
+                    <a onclick="showPublicPage('home')" class="back-link">← About CDMS</a>
+                </div>
+                <button class="btn-login" onclick="login()">Sign In</button>
+                <p class="error-msg" id="loginError">Invalid credentials</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD -->
     <section id="dashboard" class="section">
         <div class="page-header">
             <div>
                 <h2 id="greeting">Good morning, Admin</h2>
-                <p>Here's what's happening across your company today.</p>
+                <p>CDMS overview for <strong id="dashboardCompany">Netz</strong></p>
             </div>
             <span class="badge badge-primary"><span id="totalRecords">0</span> Total Records</span>
         </div>
-
         <div class="stats-grid">
-            <div class="stat-card emp" onclick="showSection('employees')">
-                <div class="stat-icon">👥</div>
-                <div class="stat-label">Employees</div>
-                <div class="stat-value" id="empCount">0</div>
+            <div class="stat-card emp" onclick="showSection('employees')" title="View employees">
+                <div class="stat-icon">👥</div><div class="stat-label">Employees</div><div class="stat-value" id="empCount">0</div>
             </div>
-            <div class="stat-card machine" onclick="showSection('machines')">
-                <div class="stat-icon">⚙️</div>
-                <div class="stat-label">Machinery</div>
-                <div class="stat-value" id="machineCount">0</div>
+            <div class="stat-card machine" onclick="showSection('machines')" title="View machinery">
+                <div class="stat-icon">⚙️</div><div class="stat-label">Machinery</div><div class="stat-value" id="machineCount">0</div>
             </div>
-            <div class="stat-card project" onclick="showSection('projects')">
-                <div class="stat-icon">📋</div>
-                <div class="stat-label">Projects</div>
-                <div class="stat-value" id="projectCount">0</div>
+            <div class="stat-card project" onclick="showSection('projects')" title="View projects">
+                <div class="stat-icon">📋</div><div class="stat-label">Projects</div><div class="stat-value" id="projectCount">0</div>
             </div>
-            <div class="stat-card vehicle" onclick="showSection('vehicles')">
-                <div class="stat-icon">🚗</div>
-                <div class="stat-label">Vehicles</div>
-                <div class="stat-value" id="vehicleCount">0</div>
+            <div class="stat-card vehicle" onclick="showSection('vehicles')" title="View vehicles">
+                <div class="stat-icon">🚗</div><div class="stat-label">Vehicles</div><div class="stat-value" id="vehicleCount">0</div>
             </div>
         </div>
-
-        <div class="dashboard-grid">
+        <div class="dashboard-grid-3">
             <div class="card">
-                <div class="card-title">📊 Data Overview</div>
-                <div class="chart-container" id="chartBars"></div>
+                <div class="card-title">⚠️ Alerts &amp; Reminders</div>
+                <div id="alertsPanel"></div>
             </div>
             <div class="card">
                 <div class="card-title">🕐 Recent Activity</div>
                 <div id="activityFeed"></div>
             </div>
+            <div class="card">
+                <div class="card-title">📌 Recently Added</div>
+                <div id="recentItems"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">📊 Data Overview</div>
+            <div class="chart-container" id="chartBars"></div>
         </div>
     </section>
 
-    <!-- ═══ EMPLOYEES ═══ -->
+    <!-- MODULE TEMPLATE: Employees -->
     <section id="employees" class="section">
-        <div class="page-header">
-            <div><h2>👥 Employee Management</h2><p>Add, edit, and manage your workforce</p></div>
-        </div>
+        <div class="page-header"><div><h2>👥 Employee Management</h2><p>Netz workforce records</p></div></div>
         <div class="card">
             <div class="module-toolbar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search employees..." oninput="searchTable('emp', this.value)">
-                </div>
-                <button class="btn btn-success" onclick="addRow('emp')">➕ Add Employee</button>
-                <button class="btn btn-secondary" onclick="exportCSV('emp')">📥 Export CSV</button>
+                <div class="search-box"><span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search employees..." oninput="searchTable('emp',this.value)"></div>
+                <button class="btn btn-secondary" onclick="exportCSV('emp')" title="Export CSV">📥 CSV</button>
             </div>
             <div class="form-panel" id="empFormPanel">
-                <div class="form-panel-header" onclick="toggleFormPanel('emp')">
-                    <h3>📝 New Employee Form</h3><span>▼</span>
-                </div>
-                <div class="form-panel-body">
+                <div class="form-panel-header" onclick="toggleFormPanel('emp')"><h3>📝 Add Employee</h3><span>▼</span></div>
+                <div class="form-panel-body" data-form-type="emp">
                     <div class="form-row" id="empForm"></div>
-                    <button class="btn btn-primary" onclick="addRow('emp')">Save Employee</button>
+                    <button class="btn btn-primary" id="empSaveBtn" onclick="addRow('emp')" disabled>Save Employee</button>
                 </div>
             </div>
-            <div class="table-wrapper">
-                <table id="empTable"><thead><tr id="empHeader"></tr></thead><tbody></tbody></table>
-            </div>
-            <div class="empty-state hidden" id="empEmpty">
-                <div class="empty-icon">👥</div><h3>No employees yet</h3><p>Add your first employee using the form above</p>
-            </div>
+            <div class="table-wrapper"><table id="empTable"><thead><tr id="empHeader"></tr></thead><tbody></tbody></table></div>
+            <div class="empty-state hidden" id="empEmpty"><div class="empty-icon">👥</div><h3>No employees yet</h3><p>Use the form above to add your first employee</p></div>
             <div class="pagination" id="empPagination"></div>
             <div class="column-tools">
-                <input id="empNewColumn" placeholder="New column name">
-                <button class="btn btn-secondary btn-sm" onclick="addColumn('emp')">Add Column</button>
-                <input id="empRemoveColumn" placeholder="Column to remove">
-                <button class="btn btn-danger btn-sm" onclick="removeColumn('emp')">Remove Column</button>
+                <input id="empNewColumn" placeholder="New column"><button class="btn btn-secondary btn-sm" onclick="addColumn('emp')">Add Column</button>
+                <input id="empRemoveColumn" placeholder="Remove column"><button class="btn btn-danger btn-sm" onclick="removeColumn('emp')">Remove</button>
             </div>
         </div>
     </section>
 
-    <!-- ═══ MACHINERY ═══ -->
+    <!-- Machinery -->
     <section id="machines" class="section">
-        <div class="page-header">
-            <div><h2>⚙️ Machinery Management</h2><p>Track equipment, maintenance, and status</p></div>
-        </div>
+        <div class="page-header"><div><h2>⚙️ Machinery Management</h2><p>Netz equipment &amp; maintenance</p></div></div>
         <div class="card">
             <div class="module-toolbar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search machinery..." oninput="searchTable('machine', this.value)">
-                </div>
-                <button class="btn btn-success" onclick="addRow('machine')">➕ Add Machine</button>
-                <button class="btn btn-secondary" onclick="exportCSV('machine')">📥 Export CSV</button>
+                <div class="search-box"><span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search machinery..." oninput="searchTable('machine',this.value)"></div>
+                <button class="btn btn-secondary" onclick="exportCSV('machine')">📥 CSV</button>
             </div>
             <div class="form-panel" id="machineFormPanel">
-                <div class="form-panel-header" onclick="toggleFormPanel('machine')">
-                    <h3>📝 New Machine Form</h3><span>▼</span>
-                </div>
-                <div class="form-panel-body">
+                <div class="form-panel-header" onclick="toggleFormPanel('machine')"><h3>📝 Add Machine</h3><span>▼</span></div>
+                <div class="form-panel-body" data-form-type="machine">
                     <div class="form-row" id="machineForm"></div>
-                    <button class="btn btn-primary" onclick="addRow('machine')">Save Machine</button>
+                    <button class="btn btn-primary" id="machineSaveBtn" onclick="addRow('machine')" disabled>Save Machine</button>
                 </div>
             </div>
-            <div class="table-wrapper">
-                <table id="machineTable"><thead><tr id="machineHeader"></tr></thead><tbody></tbody></table>
-            </div>
-            <div class="empty-state hidden" id="machineEmpty">
-                <div class="empty-icon">⚙️</div><h3>No machines registered</h3><p>Add your first machine using the form above</p>
-            </div>
+            <div class="table-wrapper"><table id="machineTable"><thead><tr id="machineHeader"></tr></thead><tbody></tbody></table></div>
+            <div class="empty-state hidden" id="machineEmpty"><div class="empty-icon">⚙️</div><h3>No machines registered</h3></div>
             <div class="pagination" id="machinePagination"></div>
             <div class="column-tools">
-                <input id="machineNewColumn" placeholder="New column name">
-                <button class="btn btn-secondary btn-sm" onclick="addColumn('machine')">Add Column</button>
-                <input id="machineRemoveColumn" placeholder="Column to remove">
-                <button class="btn btn-danger btn-sm" onclick="removeColumn('machine')">Remove Column</button>
+                <input id="machineNewColumn" placeholder="New column"><button class="btn btn-secondary btn-sm" onclick="addColumn('machine')">Add Column</button>
+                <input id="machineRemoveColumn" placeholder="Remove column"><button class="btn btn-danger btn-sm" onclick="removeColumn('machine')">Remove</button>
             </div>
         </div>
     </section>
 
-    <!-- ═══ PROJECTS ═══ -->
+    <!-- Projects -->
     <section id="projects" class="section">
-        <div class="page-header">
-            <div><h2>📋 Tender &amp; Project Tracking</h2><p>Monitor projects, budgets, and deadlines</p></div>
-        </div>
+        <div class="page-header"><div><h2>📋 Projects &amp; Tenders</h2><p>Netz project tracking</p></div></div>
         <div class="card">
             <div class="module-toolbar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search projects..." oninput="searchTable('project', this.value)">
-                </div>
-                <button class="btn btn-success" onclick="addRow('project')">➕ Add Project</button>
-                <button class="btn btn-secondary" onclick="exportCSV('project')">📥 Export CSV</button>
+                <div class="search-box"><span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search projects..." oninput="searchTable('project',this.value)"></div>
+                <button class="btn btn-secondary" onclick="exportCSV('project')">📥 CSV</button>
             </div>
             <div class="form-panel" id="projectFormPanel">
-                <div class="form-panel-header" onclick="toggleFormPanel('project')">
-                    <h3>📝 New Project Form</h3><span>▼</span>
-                </div>
-                <div class="form-panel-body">
+                <div class="form-panel-header" onclick="toggleFormPanel('project')"><h3>📝 Add Project</h3><span>▼</span></div>
+                <div class="form-panel-body" data-form-type="project">
                     <div class="form-row" id="projectForm"></div>
-                    <button class="btn btn-primary" onclick="addRow('project')">Save Project</button>
+                    <button class="btn btn-primary" id="projectSaveBtn" onclick="addRow('project')" disabled>Save Project</button>
                 </div>
             </div>
-            <div class="table-wrapper">
-                <table id="projectTable"><thead><tr id="projectHeader"></tr></thead><tbody></tbody></table>
-            </div>
-            <div class="empty-state hidden" id="projectEmpty">
-                <div class="empty-icon">📋</div><h3>No projects yet</h3><p>Start tracking your first tender or project</p>
-            </div>
+            <div class="table-wrapper"><table id="projectTable"><thead><tr id="projectHeader"></tr></thead><tbody></tbody></table></div>
+            <div class="empty-state hidden" id="projectEmpty"><div class="empty-icon">📋</div><h3>No projects yet</h3></div>
             <div class="pagination" id="projectPagination"></div>
             <div class="column-tools">
-                <input id="projectNewColumn" placeholder="New column name">
-                <button class="btn btn-secondary btn-sm" onclick="addColumn('project')">Add Column</button>
-                <input id="projectRemoveColumn" placeholder="Column to remove">
-                <button class="btn btn-danger btn-sm" onclick="removeColumn('project')">Remove Column</button>
+                <input id="projectNewColumn" placeholder="New column"><button class="btn btn-secondary btn-sm" onclick="addColumn('project')">Add Column</button>
+                <input id="projectRemoveColumn" placeholder="Remove column"><button class="btn btn-danger btn-sm" onclick="removeColumn('project')">Remove</button>
             </div>
         </div>
     </section>
 
-    <!-- ═══ VEHICLES ═══ -->
+    <!-- Vehicles -->
     <section id="vehicles" class="section">
-        <div class="page-header">
-            <div><h2>🚗 Vehicle Management</h2><p>Manage fleet, insurance, and compliance</p></div>
-        </div>
+        <div class="page-header"><div><h2>🚗 Vehicle Management</h2><p>Netz fleet &amp; compliance</p></div></div>
         <div class="card">
             <div class="module-toolbar">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" placeholder="Search vehicles..." oninput="searchTable('vehicle', this.value)">
-                </div>
-                <button class="btn btn-success" onclick="addRow('vehicle')">➕ Add Vehicle</button>
-                <button class="btn btn-secondary" onclick="exportCSV('vehicle')">📥 Export CSV</button>
+                <div class="search-box"><span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Search vehicles..." oninput="searchTable('vehicle',this.value)"></div>
+                <button class="btn btn-secondary" onclick="exportCSV('vehicle')">📥 CSV</button>
             </div>
             <div class="form-panel" id="vehicleFormPanel">
-                <div class="form-panel-header" onclick="toggleFormPanel('vehicle')">
-                    <h3>📝 New Vehicle Form</h3><span>▼</span>
-                </div>
-                <div class="form-panel-body">
+                <div class="form-panel-header" onclick="toggleFormPanel('vehicle')"><h3>📝 Add Vehicle</h3><span>▼</span></div>
+                <div class="form-panel-body" data-form-type="vehicle">
                     <div class="form-row" id="vehicleForm"></div>
-                    <button class="btn btn-primary" onclick="addRow('vehicle')">Save Vehicle</button>
+                    <button class="btn btn-primary" id="vehicleSaveBtn" onclick="addRow('vehicle')" disabled>Save Vehicle</button>
                 </div>
             </div>
-            <div class="table-wrapper">
-                <table id="vehicleTable"><thead><tr id="vehicleHeader"></tr></thead><tbody></tbody></table>
-            </div>
-            <div class="empty-state hidden" id="vehicleEmpty">
-                <div class="empty-icon">🚗</div><h3>No vehicles registered</h3><p>Add your first vehicle to the fleet</p>
-            </div>
+            <div class="table-wrapper"><table id="vehicleTable"><thead><tr id="vehicleHeader"></tr></thead><tbody></tbody></table></div>
+            <div class="empty-state hidden" id="vehicleEmpty"><div class="empty-icon">🚗</div><h3>No vehicles registered</h3></div>
             <div class="pagination" id="vehiclePagination"></div>
             <div class="column-tools">
-                <input id="vehicleNewColumn" placeholder="New column name">
-                <button class="btn btn-secondary btn-sm" onclick="addColumn('vehicle')">Add Column</button>
-                <input id="vehicleRemoveColumn" placeholder="Column to remove">
-                <button class="btn btn-danger btn-sm" onclick="removeColumn('vehicle')">Remove Column</button>
+                <input id="vehicleNewColumn" placeholder="New column"><button class="btn btn-secondary btn-sm" onclick="addColumn('vehicle')">Add Column</button>
+                <input id="vehicleRemoveColumn" placeholder="Remove column"><button class="btn btn-danger btn-sm" onclick="removeColumn('vehicle')">Remove</button>
             </div>
         </div>
     </section>
 
-    <!-- ═══ REPORTS ═══ -->
+    <!-- Reports -->
     <section id="reports" class="section">
         <div class="page-header">
-            <div><h2>📈 Reports &amp; Analytics</h2><p>Financial summaries and module insights</p></div>
-            <button class="btn btn-secondary" onclick="exportAllJSON()">📥 Export Full Backup</button>
+            <div><h2>📈 Reports &amp; Analytics</h2><p>Netz company insights via CDMS</p></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="printReport()" title="Print or save as PDF">🖨️ Print Report</button>
+                <button class="btn btn-secondary" onclick="exportAllJSON()">📥 Backup JSON</button>
+            </div>
         </div>
         <div id="reportsContent"></div>
     </section>
 
-    <!-- ═══ SETTINGS ═══ -->
+    <!-- Settings -->
     <section id="settings" class="section">
-        <div class="page-header">
-            <div><h2>⚙️ Settings</h2><p>Customize your experience and manage data</p></div>
-        </div>
+        <div class="page-header"><div><h2>⚙️ Settings</h2><p>CDMS preferences</p></div></div>
         <div class="card">
             <div class="settings-group">
                 <h3>Appearance</h3>
                 <div class="setting-row">
-                    <div><strong>Dark Mode</strong><div class="setting-desc">Switch between light and dark themes</div></div>
-                    <button class="toggle" id="themeToggle" onclick="toggleTheme(); this.classList.toggle('on')"></button>
+                    <div><strong>Dark Mode</strong><div class="setting-desc">Switch light / dark theme</div></div>
+                    <button class="toggle" id="themeToggle" onclick="toggleTheme();this.classList.toggle('on')"></button>
+                </div>
+            </div>
+            <div class="settings-group">
+                <h3>Security</h3>
+                <div class="setting-row">
+                    <div><strong>Session Timeout</strong><div class="setting-desc">Auto-logout after inactivity (minutes)</div></div>
+                    <select id="sessionMins" onchange="setSessionTimeout(this.value)" class="setting-select">
+                        <option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option>
+                    </select>
+                </div>
+                <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                    <div><strong>Change Password</strong><div class="setting-desc">Demo only — production uses secure backend</div></div>
+                    <input type="password" id="currentPassword" placeholder="Current password" class="setting-input">
+                    <input type="password" id="newPassword" placeholder="New password" class="setting-input">
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" class="setting-input">
+                    <button class="btn btn-secondary" onclick="changePassword()">Update Password</button>
                 </div>
             </div>
             <div class="settings-group">
                 <h3>Data Management</h3>
                 <div class="setting-row">
-                    <div><strong>Export Backup</strong><div class="setting-desc">Download all data as JSON file</div></div>
+                    <div><strong>Export Backup</strong><div class="setting-desc">Download all CDMS data as JSON</div></div>
                     <button class="btn btn-secondary" onclick="exportAllJSON()">Export</button>
                 </div>
                 <div class="setting-row">
-                    <div><strong>Import Backup</strong><div class="setting-desc">Restore data from a JSON backup file</div></div>
+                    <div><strong>Import Backup</strong><div class="setting-desc">Merge data from JSON file</div></div>
                     <button class="btn btn-secondary" onclick="importJSON()">Import</button>
                 </div>
                 <div class="setting-row">
-                    <div><strong>Reset All Data</strong><div class="setting-desc">Permanently delete all records and reset columns</div></div>
+                    <div><strong>Reset All Data</strong><div class="setting-desc">Delete all records permanently</div></div>
                     <button class="btn btn-danger" onclick="resetAllData()">Reset</button>
+                </div>
+                <div class="setting-row">
+                    <div><strong>Restart Tour</strong><div class="setting-desc">Replay the guided onboarding</div></div>
+                    <button class="btn btn-secondary" onclick="startTour()">Start Tour</button>
                 </div>
             </div>
             <div class="settings-group">
                 <h3>About</h3>
                 <div class="setting-row">
-                    <div><strong>CDMS v2.0</strong><div class="setting-desc">Company Data Management System — Client-side demo application</div></div>
+                    <div><strong>CDMS v3.0</strong>
+                    <div class="setting-desc"><strong>CDMS</strong> = Company Data Management System · Built for <strong>Netz</strong> · Internship Project by Aditya Goyal</div></div>
                 </div>
             </div>
         </div>
     </section>
-
 </main>
 
-<!-- Toast container -->
+<footer class="app-footer hidden" id="appFooter"></footer>
+
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- Confirm modal -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
     <div class="modal">
         <h3 id="modalTitle">Confirm</h3>
@@ -344,11 +359,16 @@
     </div>
 </div>
 
+<div class="tour-overlay" id="tourOverlay">
+    <div class="tour-box" id="tourBox"></div>
+</div>
+
+<script src="js/config.js"></script>
 <script src="js/app.js"></script>
 <script>
-    if (localStorage.getItem('cdms_theme') === 'dark') {
-        document.getElementById('themeToggle')?.classList.add('on');
-    }
+    if (localStorage.getItem('cdms_theme') === 'dark') document.getElementById('themeToggle')?.classList.add('on');
+    const sm = localStorage.getItem('cdms_session_mins');
+    if (sm && document.getElementById('sessionMins')) document.getElementById('sessionMins').value = sm;
 </script>
 </body>
 </html>

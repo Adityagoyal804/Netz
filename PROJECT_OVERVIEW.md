@@ -1,15 +1,17 @@
-# Netz (CDMS) — Project Overview for Mentor Meeting
+# CDMS — Project Overview for Mentor Meeting
 
-**Project Name:** Netz — Company Data Management System (CDMS)  
+**Project Name:** CDMS (Company Data Management System)  
+**Company:** Netz *(internship company)*  
 **Developer:** Aditya Goyal  
-**GitHub Repository:** [https://github.com/Adityagoyal804/Netz](https://github.com/Adityagoyal804/Netz)  
-**Project Type:** Web-based Management Dashboard (Frontend Application)
+**GitHub:** [https://github.com/Adityagoyal804/Netz](https://github.com/Adityagoyal804/Netz)
+
+> **Important:** Netz is the **company** where I am doing my internship. CDMS is the **project** I built for them.
 
 ---
 
 ## 1. Elevator Pitch (30 seconds)
 
-> "Netz is a **Company Data Management System** — a web dashboard that helps organizations manage **employees, machinery, projects/tenders, and vehicles** from one place. It is built using **HTML, CSS, and vanilla JavaScript** with **localStorage** for data persistence. The app includes login, a live analytics dashboard, full CRUD operations, search/sort, data export, dark mode, and a responsive UI — all without requiring a backend server."
+> "CDMS is a **Company Data Management System** I built during my internship at **Netz**. It is a web dashboard to manage employees, machinery, projects, and vehicles from one place — with login, live analytics, alerts, search, export, and a modern responsive UI."
 
 ---
 
