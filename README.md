@@ -15,7 +15,6 @@
 ## Quick Start
 
 ```bash
-cd cdms
 python -m http.server 8080
 ```
 
